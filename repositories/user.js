@@ -1,39 +1,39 @@
-const UserModel = require("../models/usermodel");
+const User = require("../models/usermodel");
 
 const createNewUser = (values) => {
-  return new UserModel(values).save().then((user) => user.toObject());
+  return new User(values).save().then((user) => user.toObject());
 };
 
 const getUsers = () =>
-  UserModel.find({ active: true }).then((users) =>
+  User.find({ active: true }).then((users) =>
     users.map((user) => user.toObject())
   );
-// Example getUserById function
+
+// Corrected getUserById function
 const getUserById = async (id) => {
-  try {
-    return await User.findById(id);
-  } catch (err) {
-    console.error("Error fetching user by ID:", err);
-    throw err;
-  }
+  return await User.findById(id).select("+password"); // Ensure password is selected
 };
 
-const getUserByEmail = (email) => UserModel.findOne({ email });
+const getUserByEmail = async (email) => {
+  const user = await User.findOne({ email }).select("+password"); // Make sure password is selected
+  console.log("Fetched User:", user); // Debugging line to check fetched user
+  return user;
+};
 
 const getUserByFirstName = (firstName) =>
-  UserModel.findOne({ firstName }).then((user) => user?.toObject());
+  User.findOne({ firstName }).then((user) => user?.toObject());
 
 const getUserByLastName = (lastName) =>
-  UserModel.findOne({ lastName }).then((user) => user?.toObject());
+  User.findOne({ lastName }).then((user) => user?.toObject());
 
 const updateUserById = (id, values) =>
-  UserModel.findByIdAndUpdate(id, values, {
+  User.findByIdAndUpdate(id, values, {
     new: true,
     runValidators: true,
     select: "-password -__v",
   }).then((user) => user?.toObject());
 
-const deleteUser = (id) => UserModel.findByIdAndDelete(id);
+const deleteUser = (id) => User.findByIdAndDelete(id);
 
 module.exports = {
   createNewUser,

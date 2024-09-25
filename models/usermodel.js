@@ -42,8 +42,7 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, "Please provide your password"],
-    minlength: [8, "Password should be a minimum of 8 characters"],
-    maxlength: [12, "Password should not exceed 12 characters"],
+    minlength: [6, "Password should be a minimum of 6 characters"],
     select: false,
   },
   role: {
@@ -53,7 +52,7 @@ const userSchema = new mongoose.Schema({
   },
   phoneNumber: {
     type: String,
-    required: [true, "Please provide a contact number"],
+    required: "Please provide a contact number",
     unique: [true, "This contact number is already in use"],
   },
   address: {
@@ -143,6 +142,7 @@ userSchema.pre("save", function (next) {
 
 // Middleware to hash password before saving
 userSchema.pre("save", async function (next) {
+  console.log("Hashing password..."); // Debugging line
   if (!this.isModified("password")) return next();
 
   const salt = await bcrypt.genSalt(12);
@@ -162,6 +162,8 @@ userSchema.pre("save", function (next) {
 
 // Method to check if entered password matches the stored password
 userSchema.methods.confirmPassword = async function (enteredPassword) {
+  console.log("Entered Password:", enteredPassword); // Debugging line
+  console.log("Stored Password:", this.password); // Debugging line
   return await bcrypt.compare(enteredPassword, this.password);
 };
 

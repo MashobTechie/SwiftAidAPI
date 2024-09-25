@@ -82,26 +82,27 @@ const signup = catchAsync(async (req, res, next) => {
 const login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
-  // Find the user by email and select the password field
-  const user = await User.findOne({ email }).select("+password");
+  // Check for missing fields
+  if (!email || !password) {
+    return next(new AppError("Please provide email and password", 400));
+  }
 
-  // Check if the user exists and if the password is correct
+  // Find the user by email and select the password field
+  const user = await getUserByEmail(email);
+
+  // If the user is not found or the password doesn't match
   if (!user || !(await user.confirmPassword(password))) {
     return next(new AppError("Incorrect email or password", 401));
   }
 
   // Generate a new JWT token
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
-  });
+  const token = signJWTToken(user._id);
 
   // Set the token as a cookie in the response
-  res.cookie("jwt", token, {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES * 24 * 60 * 60 * 1000
-    ),
+  res.cookie("token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    maxAge: 24 * 60 * 60 * 1000, // 1 day
+    secure: req.secure || req.headers["x-forwarded-proto"] === "https",
   });
 
   // Send response with success status and token
@@ -109,7 +110,6 @@ const login = catchAsync(async (req, res, next) => {
     status: "success",
     token,
   });
-  console.log("User:", user); // Debug user
 });
 
 // Resend Verification email
@@ -189,38 +189,6 @@ const verifyUserEmail = catchAsync(async (req, res, next) => {
   });
 });
 
-// Complete User Profile
-const completeProfile = catchAsync(async (req, res, next) => {
-  const userId = req.user.id; // This assumes `authenticateUser` middleware is used
-  const { emergencyContact, medicalCondition } = req.body;
-
-  // Find and update the user profile
-  const user = await updateUserById(
-    userId,
-    {
-      emergencyContact,
-      medicalCondition,
-      profileCompleted: true,
-    },
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
-
-  if (!user) {
-    return next(new AppError("User not found", 404));
-  }
-
-  res.status(200).json({
-    status: "success",
-    message: "Profile completed successfully",
-    data: {
-      user,
-    },
-  });
-});
-
 // Logout function
 const logout = async (req, res) => {
   res
@@ -231,9 +199,8 @@ const logout = async (req, res) => {
 
 module.exports = {
   signup,
-  login,
+  login, // Updated to match your existing function name
   resendEmailVerificationToken,
   verifyUserEmail,
   logout,
-  completeProfile,
 };

@@ -19,10 +19,10 @@ const validateUserSignup = (data) => {
       "string.email": "Email must be a valid email address",
       "any.required": "Email is required",
     }),
-    password: joi.string().min(8).required().messages({
+    password: joi.string().min(6).required().messages({
       "string.base": "Password must be a string",
       "string.empty": "Password cannot be empty",
-      "string.min": "Password must be at least 8 characters long",
+      "string.min": "Password must be at least 6 characters long",
       "any.required": "Password is required",
     }),
     phoneNumber: joi.string().required().messages({

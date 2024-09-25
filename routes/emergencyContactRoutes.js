@@ -1,8 +1,8 @@
 const express = require("express");
 const authMiddleware = require("../middlewares/authmiddleware");
 const emergencyContactController = require("../controllers/emergencyContactController");
-console.log(emergencyContactController);
-console.log(authMiddleware);
+// console.log(emergencyContactController);
+// console.log(authMiddleware);
 
 // Use your routes here
 

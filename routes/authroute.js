@@ -20,11 +20,4 @@ router.get(
 router.post("/verify/resend/", authcontroller.resendEmailVerificationToken);
 router.get("/logout", authMiddleware.protectRoute, authcontroller.logout);
 
-// New route for completing user profile
-router.patch(
-  "/complete-profile",
-  authMiddleware.protectRoute,
-  authcontroller.completeProfile
-);
-
 module.exports = router;
