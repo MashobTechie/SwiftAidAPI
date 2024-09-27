@@ -1,3 +1,4 @@
+// app.js
 const express = require("express");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
@@ -5,7 +6,8 @@ const errorHandler = require("./middlewares/errormiddleware");
 const AppError = require("./utils/AppError");
 const authRoutes = require("./routes/authroute");
 const userRoutes = require("./routes/userroute");
-const emergencyContactRoutes = require("./routes/emergencyContactRoutes"); // New route for emergency contacts
+const emergencyContactRoutes = require("./routes/emergencyContactRoutes");
+const medicalRecordRoutes = require("./routes/medicalRecordRoute"); // Import medical record routes
 const { cloudinaryConfig } = require("./utils/cloudinary");
 
 const app = express();
@@ -32,10 +34,11 @@ app.get("/api/v1", (req, res) => {
   });
 });
 
-// Routes for authentication and users
+// Routes for authentication, users, emergency contacts, and medical records
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", userRoutes);
-app.use("/api/v1/emergency", emergencyContactRoutes); // Add emergency contact routes
+app.use("/api/v1/emergency", emergencyContactRoutes);
+app.use("/api/v1/medicalRecords", medicalRecordRoutes); // Add medical record routes
 
 // Handle undefined routes
 app.all("*", (req, res, next) => {

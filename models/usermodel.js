@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
-
+const MedicalRecord = require("./usermedicalrecord");
 // Define the emergency contact schema
 const emergencyContactSchema = new mongoose.Schema({
   name: {
@@ -118,6 +118,9 @@ const userSchema = new mongoose.Schema({
     },
   },
   emergencyContacts: [emergencyContactSchema], // Emergency contacts field
+  medicalRecords: [
+    { type: mongoose.Schema.Types.ObjectId, ref: "MedicalRecord" },
+  ], // Reference to medical records
 });
 
 // Middleware to set profile image if not provided
