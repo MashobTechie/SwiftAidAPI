@@ -78,27 +78,7 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  responderStatus: {
-    type: String,
-    enum: ["available", "busy", "offline"],
-    required: function () {
-      return this.role === "responder";
-    },
-  },
-  responderLocation: {
-    lat: {
-      type: Number,
-      required: function () {
-        return this.role === "responder";
-      },
-    },
-    lng: {
-      type: Number,
-      required: function () {
-        return this.role === "responder";
-      },
-    },
-  },
+  
   hospitalName: {
     type: String,
     required: function () {
