@@ -7,13 +7,15 @@ const AppError = require("./utils/AppError");
 const authRoutes = require("./routes/authroute");
 const userRoutes = require("./routes/userroute");
 const emergencyContactRoutes = require("./routes/emergencyContactRoutes");
-const emergencyRoutes = require("./routes/emergencyRoute"); // Adjust the path as needed
+const emergencyRoutes = require("./routes/emergencyRoute");
+
 
 const medicalRecordRoutes = require("./routes/medicalRecordRoute"); // Import medical record routes
 const { cloudinaryConfig } = require("./utils/cloudinary");
 
 const app = express();
 const appName = "SwiftAid";
+
 
 // Middleware stack
 app.use(morgan("dev"));
@@ -42,7 +44,6 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/emergency", emergencyContactRoutes);
 app.use("/api/v1/medicalRecords", medicalRecordRoutes);
 app.use("/api", emergencyRoutes);
-
 
 // Handle undefined routes
 app.all("*", (req, res, next) => {
