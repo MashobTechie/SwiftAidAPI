@@ -79,24 +79,6 @@ const userSchema = new mongoose.Schema({
     default: false,
   },
   
-  hospitalName: {
-    type: String,
-    required: function () {
-      return this.role === "hospital";
-    },
-  },
-  hospitalAddress: {
-    type: String,
-    required: function () {
-      return this.role === "hospital";
-    },
-  },
-  hospitalCapacity: {
-    type: Number,
-    required: function () {
-      return this.role === "hospital";
-    },
-  },
   emergencyContacts: [emergencyContactSchema], // Emergency contacts field
   medicalRecords: [
     { type: mongoose.Schema.Types.ObjectId, ref: "MedicalRecord" },
