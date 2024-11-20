@@ -29,7 +29,7 @@ const addEmergencyContact = catchAsync(async (req, res, next) => {
   });
 });
 
-// Update emergency contact
+ 
 // Update emergency contact
 const updateEmergencyContact = catchAsync(async (req, res, next) => {
   const userId = req.user.id; // Get the user ID from the authenticated user
