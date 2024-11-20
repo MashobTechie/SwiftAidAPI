@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const MedicalRecord = require("./usermedicalrecord");
 // Define the emergency contact schema
+const Responder = require('./responderModel'); // Import Responder model
+
+
 const emergencyContactSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -149,6 +152,25 @@ userSchema.methods.passwordChangedAfterTokenIssued = function (JWTTimestamp) {
   }
   return false;
 };
+
+// Middleware to create a responder entry when a user with responder role is saved
+userSchema.post('save', async function (doc, next) {
+  if (doc.role === 'responder') {
+    const responderData = {
+      responderId: doc._id,
+      organizationName: `${doc.firstname} ${doc.lastname}`,
+      organizationEmail: doc.email,
+      organizationContact: doc.phoneNumber,
+    };
+
+    try {
+      await Responder.create(responderData);
+    } catch (err) {
+      console.error('Error creating Responder:', err.message);
+    }
+  }
+  next();
+});
 
 const User = mongoose.model("User", userSchema);
 
