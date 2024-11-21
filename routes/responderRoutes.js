@@ -1,28 +1,49 @@
-const express = require('express');
-const Responder = require('../models/responderModel'); // Adjust path
+const express = require("express");
 const router = express.Router();
+const { protectRoute } = require("../middlewares/authmiddleware");
+const authorizeResponder = require("../middlewares/roleCheck");
 
-const authorizeResponder = (req, res, next) => {
-  if (req.user.role !== 'responder') {
-    return res.status(403).json({ success: false, message: 'Access denied' });
-  }
-  next();
-};
-// Apply middleware to responder routes
-router.use(authorizeResponder);
+// Responder-specific controllers
+const {
+  getInitiatedEmergencies,
+  updateEmergencyStatus,
+  getResponderEmergencies,
+  resolveEmergency,
+} = require("../controllers/responderController");
 
-// Create a new responder
-router.post('/responders', async (req, res) => {
-  try {
-    const responder = await Responder.create(req.body);
-    res.status(201).json({ success: true, data: responder });
-  } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
-  }
+// Auth controllers (shared with users)
+const {
+  signup,
+  login,
+  resendEmailVerificationToken,
+  verifyUserEmail,
+  logout,
+} = require("../controllers/authcontroller");
+
+// Middleware to protect and authorize responder routes
+router.use(protectRoute); // Ensure user is authenticated
+router.use(authorizeResponder); // Ensure user has 'responder' role
+
+// Responder-specific routes
+router.get("/initiated", getInitiatedEmergencies); // Fetch emergencies with status 'initiated'
+router.patch("/update-status", updateEmergencyStatus); // Update emergency status to 'active'
+router.get("/my-emergencies", getResponderEmergencies); // Fetch emergencies assigned to the logged-in responder
+router.patch("/resolve", resolveEmergency); // Mark an active emergency as resolved
+
+// Shared auth-related routes for responders
+router.post("/signup", signup); // Responder signup
+router.post("/login", login); // Responder login
+router.post("/resend-verification", resendEmailVerificationToken); // Resend verification email
+router.get("/verify-email/:email/:verification_token", verifyUserEmail); // Verify responder email
+router.post("/logout", logout); // Logout responder
+
+// Optional dashboard endpoint
+router.get("/dashboard", (req, res) => {
+  res.status(200).json({ success: true, message: "Welcome to the responder dashboard!" });
 });
 
-// Get all responders
-router.get('/responders', async (req, res) => {
+// Fetch all responders (Admin use case or for listing responders)
+router.get("/", async (req, res) => {
   try {
     const responders = await Responder.find();
     res.status(200).json({ success: true, data: responders });
@@ -31,21 +52,19 @@ router.get('/responders', async (req, res) => {
   }
 });
 
-// Update responder status
-router.patch('/responders/:id', async (req, res) => {
+// Update responder information (Admin use case or self-update)
+router.patch("/:id", async (req, res) => {
   try {
-    const responder = await Responder.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const responder = await Responder.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
     if (!responder) {
-      return res.status(404).json({ success: false, message: 'Responder not found' });
+      return res.status(404).json({ success: false, message: "Responder not found" });
     }
     res.status(200).json({ success: true, data: responder });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
-});
-
-router.get('/dashboard', (req, res) => {
-  res.status(200).json({ success: true, message: 'Welcome to the responder dashboard!' });
 });
 
 module.exports = router;

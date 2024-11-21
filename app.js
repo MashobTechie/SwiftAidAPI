@@ -6,6 +6,7 @@ const errorHandler = require("./middlewares/errormiddleware");
 const AppError = require("./utils/AppError");
 const authRoutes = require("./routes/authroute");
 const userRoutes = require("./routes/userroute");
+const responderRoutes = require("./routes/responderRoutes");
 const emergencyContactRoutes = require("./routes/emergencyContactRoutes");
 const emergencyRoutes = require("./routes/emergencyRoute");
 
@@ -43,7 +44,9 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/emergency", emergencyContactRoutes);
 app.use("/api/v1/medicalRecords", medicalRecordRoutes);
-app.use("/api", emergencyRoutes);
+app.use("/api/v1/emergency", emergencyRoutes);
+app.use("/api/v1/responders", responderRoutes);
+
 
 // Handle undefined routes
 app.all("*", (req, res, next) => {
